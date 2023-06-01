@@ -1,5 +1,6 @@
 package de.limehome.backendchallengejava;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -28,6 +29,10 @@ public class Booking {
 
     @NonNull
     Integer numberOfNights;
+
+    Booking(BookingInput input) {
+        this(input.guestName, input.unitID, input.checkInDate, input.numberOfNights);
+    }
 }
 
 

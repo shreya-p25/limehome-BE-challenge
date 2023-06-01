@@ -1,6 +1,6 @@
 # Backend Challenge - Java
 
-This repository is a supplemental option for those who don't feel comfortable working with either our TypeScript or Python problems. It should be noted that the Python project was used as the source of truth for implementation details.
+This repository is a supplemental option for those who don't feel comfortable working with either our TypeScript or Python problems. It should be noted that the Python project was used as the source of truth for implementation details, and so this may not represent 100% idiomatic Java (sorry).
 
 ## Context
 
@@ -64,21 +64,24 @@ To navigate to the swagger docs, open the url http://localhost:8000/docs
 
 ### Running tests
 
-Open your terminal and run the following commands in the cloned directory (ignore the failing test)
+There is one failing test, which is the first task of the challenge.
+This test should pass - without changing the expected return code of course ;) - once you have fixed the bug. 
 
 ```shell
-[~]$ source ./venv/bin/activate  # activate the virtual env shell
-(venv)[~]$ pytest
+[~]$ ./gradlew clean test  
 
-=========================================================================== test session starts ============================================================================
-platform darwin -- Python 3.10.9, pytest-7.3.1, pluggy-1.0.0
-rootdir: /Users/saifmirza/work/backend-challenge-python
-plugins: freezegun-0.4.2, asyncio-0.21.0, anyio-3.6.2
-asyncio: mode=strict
-collected 5 items                                                                                                                                                          
+> Task :test FAILED
 
-========================================================================= short test summary info ==========================================================================
-FAILED app/test_bookings.py::test_different_guest_same_unit_booking_different_date - AssertionError: {"guest_name":"GuestB","unit_id":"1","check_in_date":"2023-05-22","number_of_nights":5}
-================================================================= 1 failed, 4 passed, 21 warnings in 0.36s =================================================================
+BackendChallengeIntegrationTests > differentGuestsSameUnitDifferentDifferentDays() FAILED
+    java.lang.AssertionError: Status expected:<400> but was:<200>
+        at org.springframework.test.util.AssertionErrors.fail(AssertionErrors.java:59)
+        at org.springframework.test.util.AssertionErrors.assertEquals(AssertionErrors.java:122)
+        at org.springframework.test.web.servlet.result.StatusResultMatchers.lambda$matcher$9(StatusResultMatchers.java:637)
+        at org.springframework.test.web.servlet.MockMvc$1.andExpect(MockMvc.java:214)
+        at de.limehome.backendchallengejava.BackendChallengeIntegrationTests.differentGuestsSameUnitDifferentDifferentDays(BackendChallengeIntegrationTests.java:154)
+2023-06-02T01:43:55.938+02:00 DEBUG 29251 --- [ionShutdownHook] o.s.w.c.s.GenericWebApplicationContext   : Closing org.springframework.web.context.support.GenericWebApplicationContext@75361cf6, started on Fri Jun 02 01:43:54 CEST 2023
 
+5 tests completed, 1 failed
+
+FAILURE: Build failed with an exception.
 ```
