@@ -8,6 +8,7 @@ We would like you to help us with a small service that we have for handling book
 
 ### You should help us:
 Identify and fix a bug that we've been having with bookings - there seems to be something going wrong with the booking process where a guest will arrive at a unit only to find that it's already booked and someone else is there!
+There are many ways to solve this bug - there is no single correct answer that we are looking for.
 
 ### Implement a new feature:
 Allowing guests to extend their stays if possible. It happens that <strike>sometimes</strike> all the time people love staying at our locations so much that they want to extend their stay and remain there a while longer. We'd like a new API that will let them do that
@@ -24,7 +25,6 @@ When implementing, make sure you follow known best practices around architecture
 Make sure to have the following installed
 
 - Java version 17 (make sure that your $JAVA_HOME env variable is set)
-- git
 
 ### Setup
 
@@ -66,6 +66,7 @@ To navigate to the swagger docs, open the url http://localhost:8000/docs
 
 There is one failing test, which is the first task of the challenge.
 This test should pass - without changing the expected return code of course ;) - once you have fixed the bug. 
+If you need to change the format of the object, or the given interface, please ensure all tests still pass.
 
 ```shell
 [~]$ ./gradlew clean test  

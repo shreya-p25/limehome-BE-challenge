@@ -1,6 +1,5 @@
 package de.limehome.backendchallengejava;
 
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import jakarta.persistence.*;
 import lombok.*;
 
