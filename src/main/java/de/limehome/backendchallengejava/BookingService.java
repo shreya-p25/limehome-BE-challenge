@@ -55,7 +55,7 @@ public class BookingService {
         long numBookingsForCurrentUnit = bookings
                 .stream()
                 .filter(dbBooking -> dbBooking.unitID.equals(booking.unitID))
-                .filter(dbBooking -> dbBooking.checkInDate.equals(booking.checkInDate))
+                .filter(dbBooking -> dbBooking.checkInDate.plusDays(dbBooking.numberOfNights-1).isAfter(booking.checkInDate))
                 .count();
         if (numBookingsForCurrentUnit > 0) {
             throw new UnableToBook("For the given check-in date, the unit is already occupied");
@@ -63,4 +63,40 @@ public class BookingService {
 
         return true;
     }
+
+    public boolean extendBooking(ExtendBookingInput extendBookingInput) throws UnableToBook {
+
+        //get Booking object for guest given guestName and unitId
+        List<Booking> existingBookings = bookingRepository.findByGuestNameAndUnitID(extendBookingInput.guestName, extendBookingInput.unitID);
+        if (existingBookings.isEmpty()){
+            throw new UnableToBook("There is no existing booking for the given guest name and unitID");
+        }
+
+        Booking existingBooking = existingBookings.get(0);
+
+        List<Booking> bookings = bookingRepository.findAllByCheckInDateGreaterThan(
+                existingBooking.checkInDate.plusDays(existingBooking.numberOfNights-1)
+        );
+
+        //Check if the unit is available for the number of days
+        long numBookingsForCurrentUnit = bookings
+                .stream()
+                .filter(dbBooking -> dbBooking.unitID.equals(existingBooking.unitID))
+                .filter(dbBooking -> dbBooking.checkInDate.isBefore(
+                        existingBooking.checkInDate.plusDays(
+                                existingBooking.numberOfNights + extendBookingInput.numberOfNightsToExtend -1
+                        )
+                    )
+                )
+                .count();
+        if (numBookingsForCurrentUnit > 0) {
+            throw new UnableToBook("Unable to extend booking as unit is already booked for the given duration");
+        }
+
+        existingBooking.numberOfNights += extendBookingInput.numberOfNightsToExtend;
+        bookingRepository.save(existingBooking);
+
+        return true;
+    }
+
 }

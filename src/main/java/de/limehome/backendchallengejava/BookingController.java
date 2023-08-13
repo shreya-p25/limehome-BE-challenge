@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -29,6 +30,14 @@ public class BookingController {
         try {
             Booking booking = new Booking(bookingInput.guestName, bookingInput.unitID, bookingInput.checkInDate, bookingInput.numberOfNights);
             return ResponseEntity.ok(bookingService.createBooking(booking));
+        } catch (BookingService.UnableToBook bookingException) {
+            return ResponseEntity.badRequest().body(bookingException.getMessage());
+        }
+    }
+    @PutMapping("/api/v1/booking/extend")
+    public ResponseEntity<Object> extendBooking(@RequestBody ExtendBookingInput extendBookingInput) {
+        try {
+            return ResponseEntity.ok(bookingService.extendBooking(extendBookingInput));
         } catch (BookingService.UnableToBook bookingException) {
             return ResponseEntity.badRequest().body(bookingException.getMessage());
         }

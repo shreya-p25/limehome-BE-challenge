@@ -49,3 +49,16 @@ class BookingInput {
 
     int numberOfNights;
 }
+
+@Data
+@AllArgsConstructor
+class ExtendBookingInput {
+    @NonNull
+    String guestName;
+
+    @NonNull
+    String unitID;
+
+    @NonNull
+    int numberOfNightsToExtend;
+}

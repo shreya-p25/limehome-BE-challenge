@@ -33,6 +33,10 @@ class BackendChallengeIntegrationTests {
             "guestB", "1", LocalDate.now(), 5
     );
 
+    ExtendBookingInput GUEST_A_UNIT_1_EXTEND = new ExtendBookingInput(
+            "guestA", "1",  4
+    );
+
     @Autowired
     private MockMvc mockMvc;
 
@@ -140,4 +144,52 @@ class BackendChallengeIntegrationTests {
                 .andExpect(MockMvcResultMatchers.content().string("For the given check-in date, the unit is already occupied"));
     }
 
+    @Test
+    void extendBookingPossible() throws Exception {
+        Mockito.when(bookingRepository.save(Mockito.any(Booking.class))).then(i -> i.getArguments()[0]);
+
+        Booking guestABooking = new Booking(GUEST_A_UNIT_1);
+
+        Booking nonOverlappingGuest = new Booking(new BookingInput(
+                "guestP", "1", LocalDate.now().plusDays(10), 5
+        ));
+
+        Mockito.when(bookingRepository.findByGuestNameAndUnitID("guestA", "1"))
+                .thenReturn(List.of(guestABooking));
+
+        Mockito.when(bookingRepository.findAllByCheckInDateGreaterThan(LocalDate.now().plusDays(4)))
+                .thenReturn(List.of(nonOverlappingGuest));
+
+        //Guest A is trying to extend the stay. It is successful as there are no other bookings for unit in the requested extension period
+        this.mockMvc.perform(MockMvcRequestBuilders.
+                        put("/api/v1/booking/extend").
+                        content(objectMapper.writeValueAsString(GUEST_A_UNIT_1_EXTEND))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().isOk());
+    }
+
+    @Test
+    void extendBookingNotPossible() throws Exception {
+        Mockito.when(bookingRepository.save(Mockito.any(Booking.class))).then(i -> i.getArguments()[0]);
+
+        Booking guestABooking = new Booking(GUEST_A_UNIT_1);
+
+        Booking overlappingGuest = new Booking(new BookingInput(
+                "guestP", "1", LocalDate.now().plusDays(7), 5
+        ));
+
+        Mockito.when(bookingRepository.findByGuestNameAndUnitID("guestA", "1"))
+                .thenReturn(List.of(guestABooking));
+
+        Mockito.when(bookingRepository.findAllByCheckInDateGreaterThan(LocalDate.now().plusDays(4)))
+                .thenReturn(List.of(overlappingGuest));
+
+        //Guest A is trying to extend the stay. It is successful as there are no other bookings for unit in the requested extension period
+        this.mockMvc.perform(MockMvcRequestBuilders.
+                        put("/api/v1/booking/extend").
+                        content(objectMapper.writeValueAsString(GUEST_A_UNIT_1_EXTEND))
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(MockMvcResultMatchers.status().isBadRequest())
+                .andExpect(MockMvcResultMatchers.content().string("Unable to extend booking as unit is already booked for the given duration"));
+    }
 }
